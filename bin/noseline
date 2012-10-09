@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import nose
+from nose_run_line_number import RunLineNumber
+
+if __name__ == '__main__':
+    nose.main(addplugins=[RunLineNumber()])
