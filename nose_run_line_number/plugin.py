@@ -4,7 +4,6 @@ import logging
 import os
 import ast
 from nose.plugins import Plugin
-from nose.util import src, set
 
 log = logging.getLogger('nose.plugins.runlinenumber')
 
@@ -13,6 +12,7 @@ class MethodFinder(ast.NodeVisitor):
         self.matched_function = None
         self.line_to_match = line_to_match
         self.test_pattern = test_pattern
+        self.function_lines = {}
 
     def visit_FunctionDef(self, node):
         if self.test_pattern.match(node.name):
@@ -21,10 +21,11 @@ class MethodFinder(ast.NodeVisitor):
         self.generic_visit(node)
 
     def generic_visit(self, node):
-        if self.line_to_match == getattr(node, 'lineno', -1):
+        current_line_num = getattr(node, 'lineno', -1)
+        if self.line_to_match == current_line_num and hasattr(self, 'current_function'):
             self.matched_function = self.current_function
-
-        super(MethodFinder, self).generic_visit(node)
+        elif current_line_num > 0 and hasattr(self, 'current_function'):
+            self.function_lines[current_line_num] = self.current_function
 
 class RunLineNumber(Plugin):
     name = 'runlinenumber'
@@ -49,9 +50,13 @@ class RunLineNumber(Plugin):
 
             with open(test_name, 'r') as f:
                 ast_node = ast.parse(f.read())
-            finder = MethodFinder(options.linenum, conf.testMatch)
+            linenum = options.linenum
+            finder = MethodFinder(linenum, conf.testMatch)
             finder.visit(ast_node)
             self.matched_function = finder.matched_function
+            while self.matched_function is None and linenum > 0:
+                linenum -= 1
+                self.matched_function = finder.function_lines.get(linenum)
             log.info("Matched function: %s with line %d" % (self.matched_function, options.linenum))
 
     def findTestName(self, testNames):
