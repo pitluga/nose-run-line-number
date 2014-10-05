@@ -1,12 +1,20 @@
+import inspect
+import os
 import unittest
 from nose.plugins import PluginTester
 from nose_run_line_number.plugin import RunLineNumber
 
 
+class SomeUnitTest(unittest.TestCase):
+
+    def linenumtest_some_test_1(self):
+        pass
+
+
 class TestNoseLinePlugin(PluginTester, unittest.TestCase):
     activate = '--line-file'
     plugins = [RunLineNumber()]
-    suitepath = 'tests/other_test.py'
+    suitepath = os.path.realpath(__file__).rstrip('c') # .pyc -> .py
 
     def setUp(self):
         pass
@@ -16,17 +24,20 @@ class TestNoseLinePlugin(PluginTester, unittest.TestCase):
         super(TestNoseLinePlugin, self).setUp()
 
     def test_run_line_of_method_definition(self):
-        self._run_test_on_line(6)
+        lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
+        self._run_test_on_line(lineno)
         self.assertIn("Ran 1 test", self.output)
         self.assertIn("OK", self.output)
 
     def test_run_line_inside_method_definition(self):
-        self._run_test_on_line(7)
+        lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
+        self._run_test_on_line(lineno + 1)
         self.assertIn("Ran 1 test", self.output)
         self.assertIn("OK", self.output)
 
     def test_run_line_past_method_definition(self):
-        self._run_test_on_line(8)
+        lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
+        self._run_test_on_line(lineno + len(lines))
         self.assertIn("Ran 1 test", self.output)
         self.assertIn("OK", self.output)
 
