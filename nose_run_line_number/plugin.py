@@ -27,12 +27,19 @@ class MethodFinder(ast.NodeVisitor):
         elif current_line_num > 0 and hasattr(self, 'current_function'):
             self.function_lines[current_line_num] = self.current_function
 
+        super(MethodFinder, self).generic_visit(node)
+
+
 class RunLineNumber(Plugin):
     name = 'runlinenumber'
 
     def options(self, parser, env=os.environ):
-        parser.add_option('--line', dest='linenum', metavar='LINE', type='int', help="Run test specified on this line")
-        parser.add_option('--line-file', dest='linefile', metavar='File', help="file to run the test on (used for setuptools integration)")
+        parser.add_option(
+                '--line', dest='linenum', metavar='LINE', type='int',
+                help="Run test specified on this line")
+        parser.add_option(
+                '--line-file', dest='linefile', metavar='File',
+                help="file to run the test on (used for setuptools integration)")
 
     def configure(self, options, conf):
         if options.linenum:
