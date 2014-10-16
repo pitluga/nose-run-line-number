@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "nose-run-line-number",
-    version = '0.0.1',
+    version = '0.0.2',
     description = "Nose plugin to run tests by line number",
     long_description = "Nose plugin to run tests by line number",
     url = "https://github.com/pitluga/nose-run-line-number",
