@@ -86,7 +86,6 @@ class RunLineNumber(Plugin):
                 if self.matched_class is None:
                     self.matched_class = finder.class_lines.get(linenum)
             log.info("Matched function: %s with line %d" % (self.matched_function, options.linenum))
-            print "Matched function: %s with line %d and class %s" % (self.matched_function, options.linenum, self.matched_class)
 
     def findTestName(self, testNames):
         if testNames[0] == '.' and len(testNames) > 1:
