@@ -68,25 +68,31 @@ class TestNoseLinePluginClassRunner(PluginTester, unittest.TestCase):
         self.args = ['',  '--line', str(line), '--match', 'linenumtest.*', '--level', 'class']
         super(TestNoseLinePluginClassRunner, self).setUp()
 
-    def test_run_line_of_method_definition(self):
+    def test_run_line_of_class_definition_runs_all_tests(self):
+        lines, lineno = inspect.getsourcelines(SomeUnitTest)
+        self._run_test_on_line(lineno)
+        self.assertIn("Ran 2 tests", self.output)
+        self.assertIn("OK", self.output)
+
+    def test_run_line_of_method_definition_runs_all_tests(self):
         lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
         self._run_test_on_line(lineno)
         self.assertIn("Ran 2 tests", self.output)
         self.assertIn("OK", self.output)
 
-    def test_run_line_inside_method_definition(self):
-        lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
+    def test_run_line_inside_method_definition_runs_all_tests(self):
+        lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_2)
         self._run_test_on_line(lineno + 1)
         self.assertIn("Ran 2 tests", self.output)
         self.assertIn("OK", self.output)
 
-    def test_run_line_past_method_definition(self):
+    def test_run_line_past_method_definitions_runs_all_tests(self):
         lines, lineno = inspect.getsourcelines(SomeUnitTest.linenumtest_some_test_1)
         self._run_test_on_line(lineno + len(lines))
         self.assertIn("Ran 2 tests", self.output)
         self.assertIn("OK", self.output)
 
-    def test_run_line_before_any_method_definitions_skips_test(self):
+    def test_run_line_before_any_class_definitions_skips_tests(self):
         self._run_test_on_line(1)
         self.assertIn("Ran 0 tests", self.output)
         self.assertIn("OK", self.output)
