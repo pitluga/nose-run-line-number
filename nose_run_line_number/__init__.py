@@ -1,1 +1,1 @@
-from plugin import RunLineNumber
+from .plugin import RunLineNumber
